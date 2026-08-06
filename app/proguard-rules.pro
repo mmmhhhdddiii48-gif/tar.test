@@ -1,0 +1,7 @@
+-optimizationpasses 5
+-allowaccessmodification
+-repackageclasses 'x'
+-flattenpackagehierarchy 'x'
+-renamesourcefileattribute SourceFile
+-keepattributes *Annotation*
+-dontusemixedcaseclassnames
