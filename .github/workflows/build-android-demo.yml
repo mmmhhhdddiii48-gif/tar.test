@@ -1,24 +1,24 @@
-name: Build protected Android demo
+name: Build premium Android demo v2
 
 on:
   push:
-    branches: [ main ]
+    branches: [ fix-professional-webview ]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 env:
-  NUKHBA_STORE_PASSWORD: NukhbaDemo72Hours2026
-  NUKHBA_KEY_PASSWORD: NukhbaDemo72Hours2026
-  NUKHBA_KEY_ALIAS: nukhba_demo
+  NUKHBA_STORE_PASSWORD: NukhbaPremiumDemo72Hours2026
+  NUKHBA_KEY_PASSWORD: NukhbaPremiumDemo72Hours2026
+  NUKHBA_KEY_ALIAS: nukhba_premium_demo
 
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - name: Checkout temporary source
+      - name: Checkout fixed source
         uses: actions/checkout@v4
 
       - name: Set up Java
@@ -35,33 +35,33 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Android platform
-        run: yes | sdkmanager --licenses >/dev/null || true
-
-      - name: Install build tools
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
-
-      - name: Generate temporary release key
+      - name: Install SDK
         run: |
-          keytool -genkeypair -v -keystore "$RUNNER_TEMP/nukhba-demo.jks" -storepass "$NUKHBA_STORE_PASSWORD" -alias "$NUKHBA_KEY_ALIAS" -keypass "$NUKHBA_KEY_PASSWORD" -keyalg RSA -keysize 3072 -validity 3650 -dname "CN=Nukhba ERP Demo, OU=Nukhba, O=Nukhba ERP, L=Najaf, C=IQ"
-          echo "NUKHBA_KEYSTORE=$RUNNER_TEMP/nukhba-demo.jks" >> "$GITHUB_ENV"
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Generate release key
+        run: |
+          keytool -genkeypair -v -keystore "$RUNNER_TEMP/nukhba-premium-demo.jks" -storepass "$NUKHBA_STORE_PASSWORD" -alias "$NUKHBA_KEY_ALIAS" -keypass "$NUKHBA_KEY_PASSWORD" -keyalg RSA -keysize 3072 -validity 3650 -dname "CN=Nukhba ERP Premium Demo, OU=Nukhba, O=Nukhba ERP, L=Najaf, C=IQ"
+          echo "NUKHBA_KEYSTORE=$RUNNER_TEMP/nukhba-premium-demo.jks" >> "$GITHUB_ENV"
 
       - name: Build minified signed release APK
         run: gradle --no-daemon clean assembleRelease
 
-      - name: Verify APK signature
+      - name: Verify and rename APK
         run: |
           APK="app/build/outputs/apk/release/app-release.apk"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK"
-          cp "$APK" Nukhba_Employee_Demo_3_Days_Android.apk
-          sha256sum Nukhba_Employee_Demo_3_Days_Android.apk > Nukhba_Employee_Demo_3_Days_Android.sha256.txt
+          unzip -t "$APK"
+          cp "$APK" Nukhba_Employee_Premium_Demo_3_Days_Android_v2.apk
+          sha256sum Nukhba_Employee_Premium_Demo_3_Days_Android_v2.apk > Nukhba_Employee_Premium_Demo_3_Days_Android_v2.sha256.txt
 
-      - name: Upload protected APK
+      - name: Upload premium APK
         uses: actions/upload-artifact@v4
         with:
-          name: Nukhba-Employee-Demo-3-Days-APK
+          name: Nukhba-Employee-Premium-Demo-v2
           path: |
-            Nukhba_Employee_Demo_3_Days_Android.apk
-            Nukhba_Employee_Demo_3_Days_Android.sha256.txt
+            Nukhba_Employee_Premium_Demo_3_Days_Android_v2.apk
+            Nukhba_Employee_Premium_Demo_3_Days_Android_v2.sha256.txt
           retention-days: 1
           if-no-files-found: error
