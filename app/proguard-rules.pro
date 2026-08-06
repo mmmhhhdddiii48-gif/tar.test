@@ -1,7 +1,5 @@
--optimizationpasses 5
--allowaccessmodification
--repackageclasses 'x'
--flattenpackagehierarchy 'x'
--renamesourcefileattribute SourceFile
 -keepattributes *Annotation*
--dontusemixedcaseclassnames
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+-dontwarn android.webkit.**
