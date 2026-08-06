@@ -8,6 +8,5 @@
         <item name="android:navigationBarColor">#FFFFFF</item>
         <item name="android:windowSplashScreenBackground">#17243D</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher</item>
-        <item name="android:postSplashScreenTheme">@style/AppTheme</item>
     </style>
 </resources>
